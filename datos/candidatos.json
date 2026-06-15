@@ -1,0 +1,44 @@
+{
+  "_aviso": "ESPECULATIVO. NO es senal de compra. El juicio 'priced vs no-priced' es estimacion, no edge validado. Por cada tesis que pega hay un cementerio de las que no (NFTs, metaverso). Lo obvio YA esta en el precio.",
+  "temas": [
+    {
+      "tema": "Inteligencia Artificial",
+      "cadena": "IA -> computo -> chips (GPU) -> memoria/HBM -> energia electrica -> generacion (nuclear/gas) -> red y transformadores -> enfriamiento de data centers -> agua -> terreno/inmuebles industriales",
+      "fecha_mapa": "2026-06-15",
+      "candidatos": [
+        {"eslabon": "Chips GPU (el corazon)", "ticker": "NVDA",
+         "tesis": "El pico-y-pala obvio de la IA.",
+         "riesgos": "Valoracion altisima, concentracion de clientes, competencia.",
+         "estado_inicial": "priced"},
+        {"eslabon": "Enfriamiento de data centers", "ticker": "VRT",
+         "tesis": "Mas computo = mas calor = mas enfriamiento liquido.",
+         "riesgos": "Ya subio fuerte; narrativa conocida.",
+         "estado_inicial": "priced"},
+        {"eslabon": "Generacion electrica (nuclear)", "ticker": "CEG",
+         "tesis": "Los data centers necesitan energia firme 24/7; el nuclear vuelve a la mesa.",
+         "riesgos": "Regulatorio, plazos largos, ya re-valuado por la narrativa IA.",
+         "estado_inicial": "priced"},
+        {"eslabon": "Equipos de red / transformadores", "ticker": "ETN",
+         "tesis": "Conectar nueva generacion y carga exige equipamiento electrico pesado.",
+         "riesgos": "Ciclico; parte del rerating ya ocurrio.",
+         "estado_inicial": "mixto"},
+        {"eslabon": "Uranio / combustible nuclear", "ticker": "CCJ",
+         "tesis": "Si el nuclear escala, sube la demanda de uranio aguas arriba.",
+         "riesgos": "Commodity volatil, oferta secundaria, timing incierto.",
+         "estado_inicial": "mixto"},
+        {"eslabon": "Componentes electricos (2do orden)", "ticker": "POWL",
+         "tesis": "Switchgear y distribucion para subestaciones de data centers; eslabon menos glamoroso.",
+         "riesgos": "Empresa chica, ciclica, baja cobertura.",
+         "estado_inicial": "temprano"},
+        {"eslabon": "Agua industrial (3er orden)", "ticker": "AWK",
+         "tesis": "El enfriamiento consume agua; tension hidrica donde se instalan data centers.",
+         "riesgos": "Vinculo indirecto y lento; utility regulada de bajo crecimiento.",
+         "estado_inicial": "temprano"},
+        {"eslabon": "Gas natural para energia (2do orden)", "ticker": "EQT",
+         "tesis": "Puente de generacion firme mientras el nuclear tarda; demanda electrica al alza.",
+         "riesgos": "Precio del gas volatil; presion ESG; sustitucion por renovables+nuclear.",
+         "estado_inicial": "temprano"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+# Estados generados (se regeneran en cada corrida). El cache del CAPE SI se versiona.
+datos/estado_a.json
+datos/estado_b.json

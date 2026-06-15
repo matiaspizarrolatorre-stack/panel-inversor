@@ -1,0 +1,5 @@
+# Panel del Inversor — dependencias (Python 3.10+)
+pandas>=1.5
+numpy>=1.23
+yfinance>=0.2.40
+xlrd>=2.0.1     # leer el .xls de Shiller (fallback de CAPE)

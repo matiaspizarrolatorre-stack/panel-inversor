@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel del Inversor</title>
+<style>
+  :root { --bg:#fbfbfa; --tx:#1c1c1c; --mut:#666; --bd:#e5e5e5; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:0;
+         background:var(--bg); color:var(--tx); line-height:1.5; }
+  .wrap { max-width:920px; margin:0 auto; padding:24px 18px 60px; }
+  h1 { font-size:26px; margin:6px 0 2px; }
+  .lede { color:var(--mut); margin:0 0 24px; font-size:14px; }
+  .sec { background:#fff; border:1px solid var(--bd); border-radius:14px;
+          padding:20px; margin:18px 0; }
+  .sec-head { display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+               justify-content:space-between; margin-bottom:14px; }
+  .sec-head h2 { font-size:19px; margin:0; }
+  .badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; }
+  .badge.val { background:#e7f5ec; color:#1a7f37; border:1px solid #1a7f3733; }
+  .badge.spec { background:#fdecea; color:#cf222e; border:1px solid #cf222e44; }
+  .semaforo { border:2px solid; border-radius:12px; padding:16px 18px; margin:8px 0 16px; }
+  .ver-big { font-size:26px; font-weight:800; letter-spacing:.3px; }
+  .ver-sum { font-size:14px; color:#333; margin-top:4px; }
+  .chart { margin:10px 0 18px; }
+  .chart-tit { font-size:12px; color:var(--mut); margin-bottom:4px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+  .card { border:1px solid var(--bd); border-radius:10px; padding:13px; background:#fff; }
+  .card-top { display:flex; justify-content:space-between; align-items:baseline; }
+  .card-tit { font-size:13px; color:var(--mut); }
+  .card-val { font-size:24px; font-weight:800; }
+  .card-sub { font-size:11px; color:var(--mut); margin:2px 0 8px; }
+  .card-txt { font-size:12.5px; color:#333; }
+  .rango { position:relative; height:6px; background:linear-gradient(90deg,#1a7f3733,#9a670033,#cf222e33);
+            border-radius:4px; margin:4px 0 2px; }
+  .marca { position:absolute; top:-3px; width:3px; height:12px; border-radius:2px; transform:translateX(-1px); }
+  .rango-lbl { display:flex; justify-content:space-between; font-size:9px; color:#aaa; margin-bottom:8px; }
+  .metodo { font-size:12.5px; color:#444; background:#f6f6f4; border-left:3px solid #6f42c1;
+             padding:10px 12px; border-radius:6px; margin-top:16px; }
+  .upd { font-size:11px; color:#aaa; margin-top:10px; }
+  .aviso { font-size:12.5px; color:#8a3a3a; background:#fdecea; border-radius:8px; padding:11px 13px; }
+  .tema h3 { font-size:16px; margin:16px 0 4px; }
+  .cadena { font-size:12px; color:var(--mut); margin-bottom:12px; }
+  .cand { border:1px solid var(--bd); border-left:4px solid #ccc; border-radius:8px;
+           padding:11px 13px; margin:9px 0; }
+  .cand.early { border-left-color:#1a7f37; background:#f4faf6; }
+  .cand.late { border-left-color:#cf222e; opacity:.7; }
+  .cand.mid { border-left-color:#9a6700; }
+  .cand-h { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .tk { font-family:monospace; font-size:12px; background:#eee; padding:1px 6px; border-radius:4px; }
+  .etq { font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; margin-left:auto; }
+  .etq.early { background:#1a7f37; color:#fff; }
+  .etq.late { background:#eee; color:#999; }
+  .etq.mid { background:#9a6700; color:#fff; }
+  .cand-d { font-size:12px; color:#444; margin:5px 0; }
+  .cand-t { font-size:13px; }
+  .cand-r { font-size:12px; color:#a05a00; margin-top:4px; }
+  footer { font-size:11.5px; color:#888; text-align:center; margin-top:24px;
+            border-top:1px solid var(--bd); padding-top:16px; }
+</style></head><body><div class="wrap">
+  <h1>Panel del Inversor</h1>
+  <p class="lede">Dos sistemas con niveles de confianza distintos. Lee cada badge.</p>
+  
+<section class="sec">
+  <div class="sec-head">
+    <h2>Sistema A — Monitor de Miedo / Euforia</h2>
+    <span class="badge val">VALIDADO · backtest riguroso</span>
+  </div>
+  <div class="semaforo" style="border-color:#cf222e">
+    <div class="ver-big" style="color:#cf222e">EUFORIA / CARO</div>
+    <div class="ver-sum">Valoracion cara (CAPE alto): los retornos futuros a 1/3/5 anios suelen ser flacos. Modera expectativas, no cargues de golpe.</div>
+  </div>
+  <div class="chart"><div class="chart-tit">CAPE historico (1871 → hoy)</div><svg viewBox="0 0 640 130" width="100%" style="max-width:680px"><line x1="6" y1="91.2" x2="634" y2="91.2" stroke="#ccc" stroke-dasharray="3 3"/><text x="634" y="88.2" font-size="10" fill="#999" text-anchor="end">mediana ~16</text><polyline points="6.0,106.8 8.4,102.5 10.7,102.7 13.1,104.3 15.4,102.8 17.8,105.5 20.2,106.1 22.5,105.0 24.9,106.3 27.2,104.6 29.6,110.4 32.0,114.6 34.3,108.2 36.7,102.5 39.1,98.4 41.4,93.4 43.8,94.4 46.1,83.6 48.5,87.3 50.9,94.0 53.2,91.9 55.6,93.2 57.9,94.6 60.3,100.2 62.7,99.2 65.0,93.9 67.4,88.7 69.7,82.1 72.1,85.9 74.5,93.1 76.8,92.4 79.2,91.0 81.5,88.0 83.9,85.7 86.3,96.0 88.6,92.4 91.0,81.9 93.4,82.9 95.7,87.8 98.1,91.4 100.4,89.3 102.8,89.6 105.2,84.8 107.5,87.4 109.9,89.8 112.2,88.0 114.6,82.7 117.0,79.3 119.3,69.6 121.7,77.1 124.0,82.1 126.4,80.7 128.8,62.9 131.1,71.7 133.5,69.2 135.8,79.2 138.2,93.4 140.6,92.7 142.9,84.6 145.3,81.4 147.7,79.3 150.0,81.3 152.4,95.2 154.7,107.7 157.1,100.2 159.5,95.0 161.8,92.9 164.2,97.2 166.5,97.6 168.9,94.1 171.3,97.5 173.6,97.9 176.0,101.4 178.3,103.9 180.7,104.9 183.1,108.0 185.4,106.1 187.8,101.8 190.2,104.3 192.5,108.6 194.9,117.6 197.2,120.1 199.6,121.5 202.0,118.6 204.3,123.5 206.7,124.0 209.0,124.0 211.4,122.3 213.8,117.1 216.1,115.3 218.5,117.4 220.8,115.5 223.2,114.4 225.6,110.4 227.9,106.1 230.3,103.8 232.6,98.4 235.0,85.6 237.4,75.0 239.7,63.2 242.1,54.6 244.5,71.8 246.8,74.9 249.2,83.3 251.5,106.1 253.9,120.7 256.3,114.9 258.6,98.1 261.0,97.5 263.3,106.8 265.7,106.2 268.1,90.8 270.4,83.8 272.8,73.9 275.1,79.5 277.5,102.3 279.9,91.0 282.2,95.8 284.6,90.3 286.9,99.2 289.3,100.4 291.7,102.6 294.0,114.1 296.4,110.6 298.8,104.9 301.1,106.4 303.5,104.9 305.8,102.5 308.2,96.2 310.6,91.1 312.9,105.4 315.3,104.4 317.6,109.6 320.0,107.9 322.4,110.3 324.7,108.9 327.1,104.8 329.4,103.8 331.8,102.7 334.2,102.3 336.5,103.1 338.9,103.0 341.2,104.2 343.6,97.8 346.0,89.8 348.3,82.5 350.7,80.8 353.1,87.7 355.4,88.9 357.8,98.0 360.1,92.6 362.5,84.4 364.9,85.0 367.2,87.3 369.6,86.4 371.9,78.5 374.3,74.5 376.7,87.1 379.0,78.5 381.4,76.7 383.7,71.9 386.1,68.9 388.5,70.7 390.8,70.9 393.2,82.5 395.5,72.9 397.9,73.5 400.3,73.5 402.6,76.1 405.0,83.8 407.4,91.6 409.7,94.4 412.1,87.9 414.4,87.3 416.8,85.2 419.2,86.9 421.5,91.5 423.9,103.4 426.2,114.8 428.6,106.8 431.0,104.7 433.3,104.0 435.7,107.6 438.0,110.3 440.4,111.0 442.8,111.9 445.1,112.3 447.5,115.5 449.8,111.5 452.2,113.2 454.6,116.2 456.9,119.9 459.3,112.9 461.7,109.6 464.0,111.7 466.4,110.5 468.7,107.1 471.1,104.3 473.5,97.7 475.8,89.9 478.2,92.6 480.5,97.2 482.9,95.2 485.3,88.1 487.6,89.6 490.0,93.3 492.3,84.6 494.7,84.2 497.1,81.0 499.4,77.9 501.8,76.4 504.2,76.4 506.5,77.7 508.9,72.2 511.2,63.5 513.6,64.0 516.0,50.5 518.3,40.1 520.7,25.9 523.0,25.6 525.4,10.9 527.8,6.0 530.1,8.8 532.5,41.1 534.8,52.6 537.2,54.0 539.6,69.4 541.9,64.0 544.3,55.4 546.6,61.5 549.0,62.3 551.4,60.7 553.7,64.3 556.1,56.8 558.5,60.0 560.8,70.9 563.2,90.0 565.5,91.2 567.9,77.9 570.3,79.9 572.6,68.2 575.0,79.8 577.3,73.5 579.7,76.1 582.1,69.9 584.4,64.0 586.8,61.7 589.1,58.3 591.5,62.1 593.9,61.5 596.2,54.8 598.6,48.2 600.9,42.0 603.3,40.2 605.7,47.8 608.0,48.7 610.4,51.8 612.8,34.4 615.1,23.8 617.5,35.1 619.8,57.2 622.2,52.0 624.6,43.8 626.9,31.4 629.3,26.2 631.6,21.9 634.0,20.8" fill="none" stroke="#6f42c1" stroke-width="1.6"/><circle cx="634.0" cy="13.3" r="4" fill="#cf222e"/><text x="628.0" y="6.3" font-size="11" fill="#cf222e" text-anchor="end">hoy 41</text><text x="6" y="129" font-size="9" fill="#999">1871</text><text x="634" y="129" font-size="9" fill="#999" text-anchor="end">2026</text></svg></div>
+  <div class="cards"><div class="card"><div class="card-top"><span class="card-tit">CAPE (Shiller PE)</span><span class="card-val" style="color:#cf222e">41.4</span></div><div class="card-sub">percentil historico 99 · muy caro · min ~5 · mediana ~16 · record ~44</div><div class="rango"><div class="marca" style="left:99%;background:#cf222e"></div></div><div class="rango-lbl"><span>barato</span><span>caro</span></div><div class="card-txt">Muy caro: retornos futuros historicamente bajos. No cargues.</div></div><div class="card"><div class="card-top"><span class="card-tit">VIX (miedo corto plazo)</span><span class="card-val" style="color:#444">17.7</span></div><div class="card-sub">estado: neutral</div><div class="card-txt">Nivel medio, neutral.</div></div><div class="card"><div class="card-top"><span class="card-tit">Drawdown S&P</span><span class="card-val" style="color:#444">-2.3%</span></div><div class="card-sub">estado: normal</div><div class="card-txt">Sin caida relevante desde maximos. Estar cerca de maximos NO es bajista.</div></div></div>
+  <p class="metodo">El CAPE manda (validado a 1/3/5 anios); VIX solo a 1 anio; drawdown solo de apoyo. Es un TILT DE DECADAS, no market timing: mide el miedo, NO predice cuando revierte.</p>
+  <p class="upd">Actualizado: 2026-06-15 04:57 UTC</p>
+</section>
+  
+<section class="sec">
+  <div class="sec-head">
+    <h2>Sistema B — Explorador de Cadena Temática</h2>
+    <span class="badge spec">ESPECULATIVO · NO es señal de compra</span>
+  </div>
+  <p class="aviso">ESPECULATIVO. NO es senal de compra. El juicio 'priced vs no-priced' es estimacion, no edge validado. Por cada tesis que pega hay un cementerio de las que no (NFTs, metaverso). Lo obvio YA esta en el precio.</p>
+  <div class="tema"><h3>Inteligencia Artificial</h3><div class="cadena">Cadena: IA -> computo -> chips (GPU) -> memoria/HBM -> energia electrica -> generacion (nuclear/gas) -> red y transformadores -> enfriamiento de data centers -> agua -> terreno/inmuebles industriales</div><div class="cand early"><div class="cand-h"><b>Generacion electrica (nuclear)</b> <span class="tk">CEG</span><span class="etq early">CANDIDATO A ESTUDIAR</span></div><div class="cand-d">1 año: <b>-21%</b> · P/E: <b>22.0</b></div><div class="cand-t">Los data centers necesitan energia firme 24/7; el nuclear vuelve a la mesa.</div><div class="cand-r">⚠ Regulatorio, plazos largos, ya re-valuado por la narrativa IA.</div></div><div class="cand early"><div class="cand-h"><b>Agua industrial (3er orden)</b> <span class="tk">AWK</span><span class="etq early">CANDIDATO A ESTUDIAR</span></div><div class="cand-d">1 año: <b>-7%</b> · P/E: <b>22.4</b></div><div class="cand-t">El enfriamiento consume agua; tension hidrica donde se instalan data centers.</div><div class="cand-r">⚠ Vinculo indirecto y lento; utility regulada de bajo crecimiento.</div></div><div class="cand early"><div class="cand-h"><b>Gas natural para energia (2do orden)</b> <span class="tk">EQT</span><span class="etq early">CANDIDATO A ESTUDIAR</span></div><div class="cand-d">1 año: <b>-10%</b> · P/E: <b>9.9</b></div><div class="cand-t">Puente de generacion firme mientras el nuclear tarda; demanda electrica al alza.</div><div class="cand-r">⚠ Precio del gas volatil; presion ESG; sustitucion por renovables+nuclear.</div></div><div class="cand mid"><div class="cand-h"><b>Chips GPU (el corazon)</b> <span class="tk">NVDA</span><span class="etq mid">observar</span></div><div class="cand-d">1 año: <b>+30%</b> · P/E: <b>31.4</b></div><div class="cand-t">El pico-y-pala obvio de la IA.</div><div class="cand-r">⚠ Valoracion altisima, concentracion de clientes, competencia.</div></div><div class="cand mid"><div class="cand-h"><b>Equipos de red / transformadores</b> <span class="tk">ETN</span><span class="etq mid">observar</span></div><div class="cand-d">1 año: <b>+11%</b> · P/E: <b>38.3</b></div><div class="cand-t">Conectar nueva generacion y carga exige equipamiento electrico pesado.</div><div class="cand-r">⚠ Ciclico; parte del rerating ya ocurrio.</div></div><div class="cand late"><div class="cand-h"><b>Enfriamiento de data centers</b> <span class="tk">VRT</span><span class="etq late">tarde / ya priced</span></div><div class="cand-d">1 año: <b>+136%</b> · P/E: <b>76.3</b></div><div class="cand-t">Mas computo = mas calor = mas enfriamiento liquido.</div><div class="cand-r">⚠ Ya subio fuerte; narrativa conocida.</div></div><div class="cand late"><div class="cand-h"><b>Uranio / combustible nuclear</b> <span class="tk">CCJ</span><span class="etq late">tarde / ya priced</span></div><div class="cand-d">1 año: <b>+36%</b> · P/E: <b>94.4</b></div><div class="cand-t">Si el nuclear escala, sube la demanda de uranio aguas arriba.</div><div class="cand-r">⚠ Commodity volatil, oferta secundaria, timing incierto.</div></div><div class="cand late"><div class="cand-h"><b>Componentes electricos (2do orden)</b> <span class="tk">POWL</span><span class="etq late">tarde / ya priced</span></div><div class="cand-d">1 año: <b>+321%</b> · P/E: <b>57.5</b></div><div class="cand-t">Switchgear y distribucion para subestaciones de data centers; eslabon menos glamoroso.</div><div class="cand-r">⚠ Empresa chica, ciclica, baja cobertura.</div></div></div>
+  <p class="upd">Datos de mercado actualizados: 2026-06-15 04:57 UTC · clasificación priced/temprano por reglas fijas (no es predicción).</p>
+</section>
+  <footer>
+    Sistema A es un <b>tilt de décadas</b>, no market timing: mide el miedo, no predice cuándo revierte.
+    Sistema B es <b>especulativo</b>: lo obvio ya está en el precio y por cada tesis que pega hay un cementerio.<br>
+    El pasado no garantiza el futuro. <b>Esto NO es asesoría financiera.</b>
+  </footer>
+</div></body></html>
