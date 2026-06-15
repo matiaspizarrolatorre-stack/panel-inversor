@@ -17,6 +17,7 @@ import webbrowser
 
 import sistema_a_monitor
 import sistema_b_explorador
+import auditor
 import generar_web
 
 
@@ -32,13 +33,20 @@ def main():
         sistema_b_explorador.main()
     except Exception as e:  # noqa: BLE001 - B no debe tumbar el panel
         print(f"  [B] error no fatal: {e}")
+
+    print("\n== Auditor (salud y frescura) ==")
+    salud = auditor.auditar(estado_a)
+    print(f"  SALUD: {salud['estado'].upper()} — {salud['sello']}")
+
     print("\n== Web ==")
     generar_web.main()
 
     # Telegram: solo actua si hay token+chat en el entorno (apagado por defecto).
     try:
         import notificar_telegram
-        notificar_telegram.notificar(estado_a)
+        if salud["estado"] != "ok":
+            notificar_telegram.notificar_salud(salud)   # avisa si algo se rompio/envejecio
+        notificar_telegram.notificar(estado_a)           # oportunidad / digest
     except Exception as e:  # noqa: BLE001
         print(f"  [telegram] omitido: {e}")
 

@@ -1,0 +1,27 @@
+name: Auditoria diaria
+
+# El auditor corre SOLO (separado del deploy semanal): chequea frescura/cordura/
+# cruce de fuentes/pagina-200 todos los dias y, si Telegram esta prendido, avisa
+# cuando algo se rompe o envejece. No re-publica la web.
+on:
+  schedule:
+    - cron: "0 12 * * *"   # todos los dias 12:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Correr auditor
+        run: python auditor.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}

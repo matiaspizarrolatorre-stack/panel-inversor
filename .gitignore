@@ -5,3 +5,4 @@ __pycache__/
 # Estados generados (se regeneran en cada corrida). El cache del CAPE SI se versiona.
 datos/estado_a.json
 datos/estado_b.json
+datos/salud.json

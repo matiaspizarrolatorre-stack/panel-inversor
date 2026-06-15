@@ -187,16 +187,35 @@ def construir_estado() -> dict:
         if vix_banda == "panico":
             resumen += " El VIX en panico sugiere posible rebote tactico a ~1 anio."
 
+    # --- Frase en lenguaje cotidiano (sin enganar) ---
+    if cape_banda == "barato":
+        frase = ("En cristiano: las acciones estan historicamente BARATAS. Es de los "
+                 "pocos momentos en que inclinarse a comprar mas rindio a 1, 3 y 5 anios. "
+                 "Aun asi, puede seguir cayendo antes de subir.")
+    elif cape_banda in ("caro", "muy caro"):
+        frase = ("En cristiano: las acciones estan CARAS hoy, asi que lo mas probable es "
+                 "que rindan POCO en los proximos anios. No es momento de cargar de golpe "
+                 "(pero caro puede seguir caro por anios: no es senal de vender ni de timing).")
+    else:
+        frase = ("En cristiano: precios NORMALES, sin senal fuerte para ningun lado. "
+                 "Seguir el plan de siempre.")
+    if vix_banda == "panico":
+        frase += " Ademas hay panico (VIX alto): historicamente, comprar el panico rebota a ~1 anio."
+
     return {
         "actualizado_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "veredicto": veredicto,
         "color": color,
+        "frase_cotidiana": frase,
         "resumen": resumen,
         "cape": {"valor": round(cape, 1), "percentil_historico": round(cape_pct),
                  "banda": cape_banda, "texto": cape_texto,
+                 "fecha_dato": cape_s.index[-1].strftime("%Y-%m-%d"),
                  "ref": "min ~5 · mediana ~16 · record ~44"},
-        "vix": {"valor": round(vix, 1), "banda": vix_banda, "texto": vix_texto},
-        "drawdown": {"valor": round(dd, 1), "banda": dd_banda, "texto": dd_texto},
+        "vix": {"valor": round(vix, 1), "banda": vix_banda, "texto": vix_texto,
+                "fecha_dato": vix_s.index[-1].strftime("%Y-%m-%d")},
+        "drawdown": {"valor": round(dd, 1), "banda": dd_banda, "texto": dd_texto,
+                     "fecha_dato": spx_s.index[-1].strftime("%Y-%m-%d")},
         "nota_metodo": ("El CAPE manda (validado a 1/3/5 anios); VIX solo a 1 anio; "
                         "drawdown solo de apoyo. Es un TILT DE DECADAS, no market "
                         "timing: mide el miedo, NO predice cuando revierte."),

@@ -23,6 +23,31 @@ DATOS = os.path.join(DIR, "datos")
 
 COLORES = {"verde": "#1a7f37", "amarillo": "#9a6700", "rojo": "#cf222e"}
 
+# Mini-diccionario en palabras simples (sin enganar). Se usa inline (clic) y al pie.
+GLOSARIO = {
+    "CAPE": "Precio de las acciones dividido por sus ganancias promedio de los "
+            "ultimos 10 anios (ajustadas por inflacion). Mide si el mercado esta "
+            "caro o barato a LARGO plazo. Alto = caro = suele rendir poco despues.",
+    "VIX": "El 'indice del miedo'. Mide cuanta turbulencia esperan los inversores "
+           "en el CORTO plazo. Alto (>30) = panico; bajo (<14) = calma.",
+    "drawdown": "Cuanto cayo el mercado desde su punto mas alto. Un drawdown de "
+                "-20% quiere decir que esta 20% por debajo de su maximo reciente.",
+    "percentil": "Tu posicion dentro de toda la historia. Percentil 99 = mas alto "
+                 "que el 99% de las veces en el pasado (casi un record).",
+    "euforia": "Cuando todo esta caro y optimista. Historicamente, comprar en "
+               "euforia (caro) deja retornos futuros flacos. Pero caro puede "
+               "seguir caro por anios: NO es senal de vender.",
+    "miedo": "Cuando todo esta barato y pesimista. Es —raramente— el mejor momento "
+             "historico para inclinarse a comprar mas (aunque puede caer mas antes).",
+}
+
+
+def t(termino: str, visible: str = None) -> str:
+    """Termino clickeable con explicacion en palabras simples (popover en CSS, sin JS)."""
+    txt = GLOSARIO.get(termino, "")
+    return (f'<button class="term" type="button">{visible or termino}'
+            f'<span class="pop"><b>{termino}:</b> {txt}</span></button>')
+
 
 def _leer(nombre):
     p = os.path.join(DATOS, nombre)
@@ -83,36 +108,59 @@ def tarjeta(titulo, valor, sub, texto, color, barra=""):
             f'<div class="card-txt">{texto}</div></div>')
 
 
-def seccion_a(a: dict) -> str:
+def seccion_a(a: dict, salud: dict) -> str:
     if not a:
         return "<p>Sistema A sin datos. Corre sistema_a_monitor.py.</p>"
     color = COLORES.get(a["color"], "#333")
     cape, vix, dd = a["cape"], a["vix"], a["drawdown"]
     spark = sparkline_cape(cape["valor"])
     cards = (
-        tarjeta("CAPE (Shiller PE)", cape["valor"],
-                f"percentil historico {cape['percentil_historico']} · {cape['banda']} · {cape['ref']}",
+        tarjeta(f"{t('CAPE')} <span class='mut'>(Shiller PE)</span>", cape["valor"],
+                f"{t('percentil')} {cape['percentil_historico']} · {cape['banda']} · {cape['ref']}",
                 cape["texto"], color, barra_rango(cape["percentil_historico"], color))
-        + tarjeta("VIX (miedo corto plazo)", vix["valor"], f"estado: {vix['banda']}",
-                  vix["texto"], "#444")
-        + tarjeta("Drawdown S&P", f"{dd['valor']}%", f"estado: {dd['banda']}",
-                  dd["texto"], "#444")
+        + tarjeta(f"{t('VIX')} <span class='mut'>(miedo corto plazo)</span>", vix["valor"],
+                  f"estado: {vix['banda']}", vix["texto"], "#444")
+        + tarjeta(f"{t('drawdown', 'Drawdown')} <span class='mut'>S&amp;P</span>",
+                  f"{dd['valor']}%", f"estado: {dd['banda']}", dd["texto"], "#444")
     )
+    # Veredicto grande con el termino miedo/euforia clickeable.
+    ver_html = a["veredicto"].replace("EUFORIA", t("euforia", "EUFORIA")).replace(
+        "MIEDO", t("miedo", "MIEDO"))
+    sello = sello_salud(salud)
     return f"""
 <section class="sec">
   <div class="sec-head">
     <h2>Sistema A — Monitor de Miedo / Euforia</h2>
     <span class="badge val">VALIDADO · backtest riguroso</span>
   </div>
+  {sello}
+  <div class="frase">{a.get('frase_cotidiana','')}</div>
   <div class="semaforo" style="border-color:{color}">
-    <div class="ver-big" style="color:{color}">{a['veredicto']}</div>
+    <div class="ver-big" style="color:{color}">{ver_html}</div>
     <div class="ver-sum">{a['resumen']}</div>
   </div>
-  <div class="chart"><div class="chart-tit">CAPE historico (1871 → hoy)</div>{spark}</div>
+  <div class="chart"><div class="chart-tit">{t('CAPE')} historico (1871 → hoy)</div>{spark}</div>
   <div class="cards">{cards}</div>
   <p class="metodo">{a['nota_metodo']}</p>
   <p class="upd">Actualizado: {a['actualizado_utc']}</p>
 </section>"""
+
+
+def sello_salud(salud: dict) -> str:
+    if not salud:
+        return ""
+    clase = {"ok": "ok", "warn": "warn", "error": "err"}.get(salud["estado"], "warn")
+    items = "".join(
+        f'<li class="{c["estado"]}">{c["nombre"]}: {c["detalle"]}</li>'
+        for c in salud.get("checks", []))
+    return (f'<details class="salud {clase}"><summary>{salud["sello"]} '
+            f'<span class="mut">· auditoria de datos ({salud["actualizado_utc"]})</span>'
+            f'</summary><ul class="salud-list">{items}</ul></details>')
+
+
+def glosario_html() -> str:
+    filas = "".join(f'<dt>{k}</dt><dd>{v}</dd>' for k, v in GLOSARIO.items())
+    return f'<details class="glos"><summary>📖 Glosario — qué significa cada término</summary><dl>{filas}</dl></details>'
 
 
 def seccion_b(b: dict) -> str:
@@ -150,6 +198,7 @@ def seccion_b(b: dict) -> str:
 def main():
     a = _leer("estado_a.json")
     b = _leer("estado_b.json")
+    salud = _leer("salud.json")
     html = f"""<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panel del Inversor</title>
@@ -207,11 +256,39 @@ def main():
   .cand-r {{ font-size:12px; color:#a05a00; margin-top:4px; }}
   footer {{ font-size:11.5px; color:#888; text-align:center; margin-top:24px;
             border-top:1px solid var(--bd); padding-top:16px; }}
+  .mut {{ color:var(--mut); font-weight:400; font-size:.82em; }}
+  /* Terminos clickeables: popover con CSS :focus, sin JS */
+  .term {{ background:none; border:none; border-bottom:1px dotted #6f42c1; color:inherit;
+           cursor:pointer; font:inherit; padding:0; position:relative; }}
+  .term .pop {{ display:none; position:absolute; left:0; top:150%; width:min(260px,78vw);
+                background:#1c1c1c; color:#fff; font-size:12px; font-weight:400; line-height:1.45;
+                text-align:left; padding:9px 11px; border-radius:8px; z-index:20;
+                box-shadow:0 6px 18px rgba(0,0,0,.22); }}
+  .term:focus {{ outline:none; }}
+  .term:focus .pop {{ display:block; }}
+  .frase {{ font-size:15.5px; background:#f0f4ff; border:1px solid #d7e2ff; color:#1a2a4a;
+            border-radius:10px; padding:13px 15px; margin:4px 0 14px; }}
+  .salud {{ font-size:12.5px; border-radius:8px; padding:8px 12px; margin:0 0 12px; }}
+  .salud.ok {{ background:#e7f5ec; border:1px solid #1a7f3733; }}
+  .salud.warn {{ background:#fff6e0; border:1px solid #9a670044; }}
+  .salud.err {{ background:#fdecea; border:1px solid #cf222e55; }}
+  .salud summary {{ cursor:pointer; font-weight:700; }}
+  .salud-list {{ margin:8px 0 0; padding-left:18px; font-weight:400; }}
+  .salud-list li.ok::marker {{ content:"✓ "; color:#1a7f37; }}
+  .salud-list li.warn::marker {{ content:"! "; color:#9a6700; }}
+  .salud-list li.error::marker {{ content:"✗ "; color:#cf222e; }}
+  .glos {{ background:#fff; border:1px solid var(--bd); border-radius:12px; padding:14px 18px;
+           margin:18px 0; font-size:13px; }}
+  .glos summary {{ cursor:pointer; font-weight:700; font-size:15px; }}
+  .glos dt {{ font-weight:700; margin-top:10px; }}
+  .glos dd {{ margin:2px 0 0; color:#333; }}
 </style></head><body><div class="wrap">
   <h1>Panel del Inversor</h1>
-  <p class="lede">Dos sistemas con niveles de confianza distintos. Lee cada badge.</p>
-  {seccion_a(a)}
+  <p class="lede">Dos sistemas con niveles de confianza distintos. Lee cada badge.
+     Tocá cualquier <button class="term" type="button">término subrayado<span class="pop">Así se ven las explicaciones: tocá una palabra subrayada y aparece su significado en simple.</span></button> para ver qué significa.</p>
+  {seccion_a(a, salud)}
   {seccion_b(b)}
+  {glosario_html()}
   <footer>
     Sistema A es un <b>tilt de décadas</b>, no market timing: mide el miedo, no predice cuándo revierte.
     Sistema B es <b>especulativo</b>: lo obvio ya está en el precio y por cada tesis que pega hay un cementerio.<br>

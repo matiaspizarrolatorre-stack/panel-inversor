@@ -13,6 +13,25 @@ Panel personal con **dos sistemas de confianza distinta** (no los mezcles):
 
 > **Esto NO es asesoría financiera. El pasado no garantiza el futuro.**
 
+La web es **entendible para cualquiera**: una frase de veredicto en lenguaje cotidiano
+("En cristiano: ..."), cada término técnico (CAPE, VIX, drawdown, percentil, miedo/
+euforia) es **clickeable** y despliega su explicación en simple, y hay un **glosario**
+al pie. Sin simplificar hasta engañar: los caveats (tilt de décadas, no es asesoría)
+quedan siempre visibles.
+
+### Auditor de salud y frescura (`auditor.py`)
+Para prevenir el bug del "dato congelado" (que ya pasó: el CAPE de Shiller estuvo 3
+años viejo). Chequea: **frescura** (alerta si CAPE/VIX/S&P superan X días),
+**cordura** (CAPE 5–50, VIX 9–90), **cruce de fuentes** (CAPE multpl vs Shiller en su
+fecha común) y **salud del deploy** (página responde 200). Muestra un **sello visible**
+en la web (✅ fresco / ⚠️ revisar) y, si Telegram está prendido, **avisa cuando algo se
+rompe o envejece**. Corre dentro del job semanal y también solo:
+```bash
+python auditor.py            # auditoría standalone
+```
+Además hay una **Action diaria** (`auditoria.yml`) que solo audita y alerta (sin
+re-publicar), para detectar un dato congelado en 1 día y no en 1 semana.
+
 ## Correr local (previsualizar)
 
 Requiere Python 3.10+.

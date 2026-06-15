@@ -57,5 +57,22 @@ def notificar(estado_a: dict | None = None):
     print("  [telegram] enviado.")
 
 
+def notificar_salud(salud: dict):
+    """Avisa por Telegram si el auditor detecto algo roto o viejo (solo si configurado)."""
+    token = os.environ.get("TELEGRAM_TOKEN")
+    chat = os.environ.get("TELEGRAM_CHAT")
+    if not token or not chat:
+        raise RuntimeError("sin TELEGRAM_TOKEN/TELEGRAM_CHAT (hook apagado)")
+    if salud.get("estado") == "ok":
+        return
+    icono = "⛔" if salud["estado"] == "error" else "⚠️"
+    problemas = "\n".join(f"- {c['nombre']}: {c['detalle']}"
+                          for c in salud.get("checks", [])
+                          if c["estado"] != "ok")
+    texto = (f"{icono} <b>Panel: revisar datos</b>\n{salud['sello']}\n{problemas}")
+    _enviar(token, chat, texto)
+    print("  [telegram] alerta de salud enviada.")
+
+
 if __name__ == "__main__":
     notificar()
