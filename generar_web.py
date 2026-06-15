@@ -58,13 +58,18 @@ def _leer(nombre):
 
 
 def sparkline_cape(valor_actual: float) -> str:
-    """Mini-grafico SVG inline del CAPE historico, con la marca del valor actual."""
+    """
+    Grafico INTERACTIVO del CAPE historico: pasando el mouse (o tocando en movil)
+    aparece una linea-guia + un punto + un cartel con el mes y el valor exacto.
+    Ideal para inspeccionar los picos (2000 ~44, hoy ~41...). JS minimo embebido,
+    sin librerias externas (funciona offline en GitHub Pages).
+    """
     csv = os.path.join(DATOS, "cape_historico.csv")
     if not os.path.exists(csv):
         return ""
     s = pd.read_csv(csv, index_col=0, parse_dates=True)["cape"].dropna()
-    s = s.iloc[:: max(1, len(s) // 240)]                    # downsample
-    W, H, pad = 640, 130, 6
+    s = s.iloc[:: max(1, len(s) // 600)]                    # downsample (~600 puntos)
+    W, H, pad = 680, 170, 8
     lo, hi = float(s.min()), float(max(s.max(), valor_actual))
     xs = [pad + i * (W - 2 * pad) / (len(s) - 1) for i in range(len(s))]
     ys = [H - pad - (v - lo) / (hi - lo) * (H - 2 * pad) for v in s.values]
@@ -78,19 +83,62 @@ def sparkline_cape(valor_actual: float) -> str:
         if lo <= ref <= hi:
             y = y_de(ref)
             lineas += (f'<line x1="{pad}" y1="{y:.1f}" x2="{W-pad}" y2="{y:.1f}" '
-                       f'stroke="#ccc" stroke-dasharray="3 3"/>'
-                       f'<text x="{W-pad}" y="{y-3:.1f}" font-size="10" fill="#999" '
+                       f'stroke="#ddd" stroke-dasharray="3 3"/>'
+                       f'<text x="{W-pad}" y="{y-3:.1f}" font-size="10" fill="#aaa" '
                        f'text-anchor="end">{etiq}</text>')
     yc = y_de(valor_actual)
-    return (f'<svg viewBox="0 0 {W} {H}" width="100%" style="max-width:680px">'
-            f'{lineas}'
-            f'<polyline points="{pts}" fill="none" stroke="#6f42c1" stroke-width="1.6"/>'
-            f'<circle cx="{xs[-1]:.1f}" cy="{yc:.1f}" r="4" fill="#cf222e"/>'
-            f'<text x="{xs[-1]-6:.1f}" y="{yc-7:.1f}" font-size="11" fill="#cf222e" '
-            f'text-anchor="end">hoy {valor_actual:.0f}</text>'
-            f'<text x="{pad}" y="{H-1}" font-size="9" fill="#999">{s.index[0].year}</text>'
-            f'<text x="{W-pad}" y="{H-1}" font-size="9" fill="#999" '
-            f'text-anchor="end">{s.index[-1].year}</text></svg>')
+
+    # Datos embebidos para el JS (redondeados).
+    XS = json.dumps([round(x, 1) for x in xs])
+    YS = json.dumps([round(y, 1) for y in ys])
+    FE = json.dumps([d.strftime("%m/%Y") for d in s.index])
+    VA = json.dumps([round(float(v), 1) for v in s.values])
+
+    return f"""
+<div class="cap-wrap">
+  <svg id="cap-svg" viewBox="0 0 {W} {H}" width="100%" preserveAspectRatio="none"
+       style="max-width:720px;display:block">
+    {lineas}
+    <polyline points="{pts}" fill="none" stroke="#6f42c1" stroke-width="1.6"/>
+    <circle cx="{xs[-1]:.1f}" cy="{yc:.1f}" r="4" fill="#cf222e"/>
+    <text x="{xs[-1]-6:.1f}" y="{yc-7:.1f}" font-size="11" fill="#cf222e"
+          text-anchor="end">hoy {valor_actual:.0f}</text>
+    <line id="cap-cross" y1="{pad}" y2="{H-pad}" stroke="#6f42c1" stroke-width="1"
+          stroke-dasharray="2 2" style="display:none"/>
+    <circle id="cap-hot" r="3.5" fill="#6f42c1" style="display:none"/>
+    <text x="{pad}" y="{H-2}" font-size="9" fill="#aaa">{s.index[0].year}</text>
+    <text x="{W-pad}" y="{H-2}" font-size="9" fill="#aaa"
+          text-anchor="end">{s.index[-1].year}</text>
+  </svg>
+  <div id="cap-tip" class="cap-tip"></div>
+</div>
+<div class="cap-hint">↔ Pasá el mouse (o tocá y arrastrá en el celu) sobre el gráfico para ver el valor de cada mes.</div>
+<script>
+(function(){{
+  var XS={XS},YS={YS},FE={FE},VA={VA},W={W},H={H};
+  var svg=document.getElementById('cap-svg'),wrap=svg.parentNode;
+  var cross=document.getElementById('cap-cross'),hot=document.getElementById('cap-hot');
+  var tip=document.getElementById('cap-tip');
+  function mostrar(clientX){{
+    var r=svg.getBoundingClientRect();
+    var vbx=(clientX-r.left)/r.width*W;          // px del mouse -> coords del viewBox
+    var i=0,best=1e9;
+    for(var k=0;k<XS.length;k++){{var d=Math.abs(XS[k]-vbx); if(d<best){{best=d;i=k;}}}}
+    cross.setAttribute('x1',XS[i]); cross.setAttribute('x2',XS[i]); cross.style.display='';
+    hot.setAttribute('cx',XS[i]); hot.setAttribute('cy',YS[i]); hot.style.display='';
+    tip.innerHTML='<b>CAPE '+VA[i].toFixed(1)+'</b><br>'+FE[i];
+    tip.style.display='block';
+    var px=XS[i]/W*r.width;                       // ubicar el cartel sobre el punto
+    tip.style.left=Math.max(4,Math.min(px-tip.offsetWidth/2, wrap.clientWidth-tip.offsetWidth-4))+'px';
+    tip.style.top=Math.max(0,YS[i]/H*r.height-tip.offsetHeight-10)+'px';
+  }}
+  function ocultar(){{cross.style.display='none';hot.style.display='none';tip.style.display='none';}}
+  svg.addEventListener('mousemove',function(e){{mostrar(e.clientX);}});
+  svg.addEventListener('mouseleave',ocultar);
+  svg.addEventListener('touchstart',function(e){{mostrar(e.touches[0].clientX);}},{{passive:true}});
+  svg.addEventListener('touchmove',function(e){{mostrar(e.touches[0].clientX);}},{{passive:true}});
+}})();
+</script>"""
 
 
 def barra_rango(pct: int, color: str) -> str:
@@ -223,6 +271,13 @@ def main():
   .ver-sum {{ font-size:14px; color:#333; margin-top:4px; }}
   .chart {{ margin:10px 0 18px; }}
   .chart-tit {{ font-size:12px; color:var(--mut); margin-bottom:4px; }}
+  .cap-wrap {{ position:relative; }}
+  #cap-svg {{ cursor:crosshair; touch-action:none; }}
+  .cap-tip {{ display:none; position:absolute; pointer-events:none; background:#1c1c1c;
+              color:#fff; font-size:11.5px; line-height:1.3; padding:5px 8px;
+              border-radius:6px; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,.25);
+              z-index:5; }}
+  .cap-hint {{ font-size:11px; color:#aaa; margin:-8px 0 14px; }}
   .cards {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }}
   .card {{ border:1px solid var(--bd); border-radius:10px; padding:13px; background:#fff; }}
   .card-top {{ display:flex; justify-content:space-between; align-items:baseline; }}
